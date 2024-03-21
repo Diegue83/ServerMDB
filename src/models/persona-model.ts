@@ -39,6 +39,10 @@ const personaSchema = new Schema(
       type: String,
       required: true,
     },
+    ciudad:{
+      type:String,
+      required:true
+    }
   },
   {
     versionKey: false,

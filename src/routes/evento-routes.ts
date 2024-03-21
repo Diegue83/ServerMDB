@@ -14,7 +14,8 @@ class EventosRoutes {
 
 
     private config() {
-        this.router.get('/', eventosController.get);        
+        this.router.get('/', eventosController.get);
+        this.router.get('/eventos/:fechaEvento', eventosController.getEventByDay);
         this.router.post('/',eventosController.add );
         this.router.post('/participante/:evento',eventosController.addPart );
         this.router.get('/participante/:evento',eventosController.getPart );

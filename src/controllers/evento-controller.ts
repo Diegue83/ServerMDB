@@ -1,3 +1,4 @@
+import { Evento } from './../interfaces/evento';
 import { Request, Response } from "express";
 import eventoModel from "../models/eventoModel";
 import Persona from "../models/persona-model";
@@ -5,12 +6,13 @@ import Persona from "../models/persona-model";
 class EventosController {
   public async add(req: Request, res: Response) {
     try {
-      if(req.body.nombreEvento=='' || req.body.cupoMaximo=='' || req.body.fecha=='' || req.body.nomArea=='' || req.body.nomCiudad==''){
+      const evento:Evento=req.body
+      if(evento.nombreEvento=="" || evento.cupoMaximo===0 || evento.fecha==="" || evento.nomArea=='' || evento.nomCiudad==''){
         return res.status(400).json({ message: "Todos los campos deben estar llenos", code: 0 });
       }
 
       await eventoModel.insertMany(req.body);
-      return res.status(201).json({ message: "Incercion Exitosa", code: 0 });
+      return res.status(201).json({ message: "Incercion Exitosa :)", code: 0 });
     } catch (error) {
       return res.status(500).json({ error: "Error interno del servidor" });
     }
@@ -18,18 +20,30 @@ class EventosController {
 
   public async get(req: Request, res: Response) {
     try {
-      const evento = await eventoModel.find();
+      const evento = await eventoModel.find().sort({fecha:1});
       return res.status(201).json(evento);
     } catch (error) {
       return res.status(500).json({ error: "Error interno del servidor" });
     }
   }
 
+  public async getEventByDay(req: Request, res: Response) {
+
+    const {fechaEvento} =req.params
+    try {
+      const evento = await eventoModel.find({fecha:{$eq:fechaEvento}}).sort({fecha:1});
+      return res.status(201).json(evento);
+    } catch (error) {
+      return res.status(500).json({ error: "Error interno del servidor" });
+    }
+  }
+
+
   //Evento para agregar participantes
   public async addPart(req: Request, res: Response) {
     try {
       const { evento } = req.params;
-      const participante = req.body;
+      let participante = req.body;
 
       if (participante.nombre==="" || participante.apP==="" || participante.apM==="") {
         return res.status(404).json({
@@ -64,6 +78,8 @@ class EventosController {
         nuevoFolio = maxFolio[0].maxFolio + 1;
       }
 
+      participante.folio=nuevoFolio;
+
       if (personaExist.length === 0) {
         return res.status(404).json({
           message: "La persona no está registrada en la página",
@@ -92,6 +108,11 @@ class EventosController {
           .json({ message: "Ya estas apuntado en este evento", code: 1 });
       }
       // Agregar el participante al evento
+      if(event.cupoMaximo==0){
+        return res
+          .status(400)
+          .json({ message: "Evento Lleno :(", code: 3 });
+      }
       event.cupoMaximo--
       event.participantes.push(participante);
       // Guardar los cambios en la base de datos

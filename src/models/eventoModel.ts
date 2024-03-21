@@ -9,10 +9,10 @@ const registro = new Schema({
     type: String,
   },
   apP:{
-    type:String
+    type:String,
   },
   apM:{
-    type:String
+    type:String,
   },
   fechaRegistro: {
     type: Date,
@@ -25,18 +25,23 @@ const Evento = new Schema(
   {
     nombreEvento: {
       type: String,
+      required:true
     },
     cupoMaximo: {
       type: Number,
+      required:true
     },
     fecha: {
       type: Date,
+      required:true
     },
     nomCiudad: {
       type: String,
+      required:true
     },
     nomArea: {
       type: String,
+      required:true
     },
     participantes: [registro], // Incrusta el esquema interno
   },
